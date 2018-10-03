@@ -24,3 +24,21 @@ Downvote the jokes:
 curl -XPOST jokes.jonathan-boudreau/10/down
 curl -XPOST jokes.jonathan-boudreau/10/naman
 ```
+
+## Running the server
+
+### Docker compose
+You can run the server in docker compose:
+
+```yaml
+version: '2.1'
+services:
+  app:
+    image: aghost7/jokemongo
+    environment:
+      jokemongo.db.url: 'mongodb://db/jokemongo'
+    ports:
+      - 8066:8066
+  db:
+    image: mongo
+```
