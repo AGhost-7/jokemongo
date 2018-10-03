@@ -71,3 +71,6 @@ And also:
 ```sh
 curl $(minikube service jokemongo --url)
 ```
+
+#### Doing it the right way
+WIP
