@@ -42,3 +42,32 @@ services:
   db:
     image: mongo
 ```
+
+### Kubernetes
+This simple app was mainly built so that I can experiment with kubernetes
+clustering with a stateful app. As a result, its fairly simple to get going.
+This will be split into two parts: how to get the app running in kubernetes
+with the least amount of effort and how to get it running with replication.
+
+If you don't already have kubernetes locally, make sure to check out
+[minikube](https://github.com/kubernetes/minikube).
+
+#### Doing it the wrong way
+
+Spin up the cluster:
+```sh
+minikube start
+kubectl apply -f k8s/technically-incorrect-pv.yml
+kubectl apply -f k8s/technically-incorrect-deployment.yml
+```
+
+And you can now interact with the app using:
+```sh
+curl $(minikube service jokemongo --url) \
+	-d 'What is the motto of people who harvest organs? We de-liver.'
+```
+
+And also:
+```sh
+curl $(minikube service jokemongo --url)
+```
