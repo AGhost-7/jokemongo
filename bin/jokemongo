@@ -2,7 +2,12 @@
 
 const config = require('../lib/config')
 const app = require('../lib/app')
+const health = require('../lib/health')
 
-app.listen(config.get('port'), () => {
-  console.log('Listening on port %s', config.get('port'))
+health.listen(config.get('health.port'), () => {
+  console.log('Health API listening on port %s', config.get('health.port'))
+})
+
+app.listen(config.get('app.port'), () => {
+  console.log('Listening on port %s', config.get('app.port'))
 })
