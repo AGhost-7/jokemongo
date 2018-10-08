@@ -57,7 +57,6 @@ If you don't already have kubernetes locally, make sure to check out
 Spin up the cluster:
 ```sh
 minikube start
-kubectl apply -f k8s/technically-incorrect-pv.yml
 kubectl apply -f k8s/technically-incorrect-deployment.yml
 ```
 

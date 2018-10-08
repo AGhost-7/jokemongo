@@ -19,6 +19,7 @@ metadata:
   labels:
     app: jokemongo
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: jokemongo
@@ -78,5 +79,5 @@ spec:
             mountPath: /data/db
       volumes:
       - name: mongo-persistent-storage
-        persistentVolumeClaim:
-          claimName: jokemongo-pv-claim
+        hostPath:
+          path: /mnt/jokemongo
