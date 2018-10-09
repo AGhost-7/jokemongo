@@ -34,8 +34,8 @@ spec:
       - image: aghost7/jokemongo
         name: jokemongo
         env:
-          - name: jokemongo.db.url
-            value: mongodb://mongo/jokemongo
+          - name: jokemongo.db.host
+            value: mongo
 ---
 apiVersion: v1
 kind: Service

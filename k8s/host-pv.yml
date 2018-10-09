@@ -1,0 +1,13 @@
+# This is for testing the replicated deployment with just one replica
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jokemongo-host-pv
+spec:
+  storageClassName: host
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/jokemongo

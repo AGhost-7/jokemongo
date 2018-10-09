@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jokemongo
+spec:
+  ports:
+    - port: 8066
+      targetPort: 8066
+      protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: jokemongo
+    tier: front
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jokemongo
+  labels:
+    app: jokemongo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jokemongo
+      tier: front
+  template:
+    metadata:
+      labels:
+        app: jokemongo
+        tier: front
+    spec:
+      containers:
+      - image: aghost7/jokemongo
+        name: jokemongo
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8067
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        env:
+        - name: jokemongo.db.host
+          # TODO: service discovery?
+          value: mongo-0.mongo
+        - name: jokemongo.db.user
+          value: jokemongo
+        - name: jokemongo.db.password
+          valueFrom:
+            secretKeyRef:
+              name: jokemongo-secrets
+              key: db-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  ports:
+  - port: 27017
+  clusterIP: None
+  selector:
+    app: jokemongo
+    tier: db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+  labels:
+    app: jokemongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jokemongo
+      tier: db
+  serviceName: mongo
+  template:
+    metadata:
+      labels:
+        app: jokemongo
+        tier: db
+    spec:
+      containers:
+      - image: mongo:4.1
+        name: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: jokemongo
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jokemongo-secrets
+              key: db-password
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-persistent-storage
+    spec:
+      accessModes: 
+      - ReadWriteOnce
+      storageClassName: "host"
+      resources:
+        requests:
+          storage: 1Gi
