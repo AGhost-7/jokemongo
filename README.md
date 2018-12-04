@@ -72,4 +72,47 @@ curl $(minikube service jokemongo --url)
 ```
 
 #### Doing it the right way
-WIP
+
+##### Azure
+**WIP**
+
+Requirements:
+- Azure Account
+- Azure CLI of installed
+
+Create the resource group:
+```bash
+az group create --name jokemongo --location canadacentral
+```
+
+Create the kubernetes cluster:
+```bash
+az aks create \
+	--resource-group jokemongo \
+	--name jokemongo-cluster \
+	--node-count 2 \
+	--enable-addons monitoring \
+	--generate-ssh-keys
+```
+
+Load up the kubectl context:
+```bash
+az ask get-credentials --resource-group jokemongo --name jokemongo-cluster
+```
+
+Create the not-so-secret secret:
+```bash
+kubectl create -f k8s/sample-secret.yml
+```
+
+Create the resources:
+```bash
+kubectl create -f k8s/replicated-deployment.yml
+```
+
+TODO:
+- auth failure issue??
+- mongodb failover
+- domain
+- ssl
+- any additional tasks for high availability

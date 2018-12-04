@@ -4,10 +4,17 @@ kind: PersistentVolume
 metadata:
   name: jokemongo-host-pv
 spec:
-  storageClassName: host
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
     path: /mnt/jokemongo
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jokemongo-secrets
+data:
+  # This is just "sample-password" which is base64 encoded
+  db-password: c2FtcGxlLXBhc3N3b3JkCg==

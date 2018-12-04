@@ -50,6 +50,12 @@ spec:
             secretKeyRef:
               name: jokemongo-secrets
               key: db-password
+      initContainers:
+      # Without this the container will fail to create too many times and
+      # kubernetes will wait a long period before trying to recreate.
+      - name: wait-mongo
+        image: aghost7/netcat:jessie
+        command: ['bash', '-c', 'while ! nc -z mongo-0.mongo 27017; do sleep 1; done']
 ---
 apiVersion: v1
 kind: Service
@@ -69,6 +75,7 @@ metadata:
   name: mongo
   labels:
     app: jokemongo
+    tier: db
 spec:
   replicas: 1
   selector:
@@ -102,7 +109,6 @@ spec:
     spec:
       accessModes: 
       - ReadWriteOnce
-      storageClassName: "host"
       resources:
         requests:
           storage: 1Gi

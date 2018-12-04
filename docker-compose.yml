@@ -1,5 +1,8 @@
 version: "2.1"
 services:
   db:
-    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_PASSWORD=foobar
+      - MONGO_INITDB_ROOT_USERNAME=root
+    image: mongo:4.1
     network_mode: host
