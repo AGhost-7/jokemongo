@@ -90,14 +90,14 @@ Create the kubernetes cluster:
 az aks create \
 	--resource-group jokemongo \
 	--name jokemongo-cluster \
-	--node-count 2 \
+	--node-count 1 \
 	--enable-addons monitoring \
 	--generate-ssh-keys
 ```
 
 Load up the kubectl context:
 ```bash
-az ask get-credentials --resource-group jokemongo --name jokemongo-cluster
+az aks get-credentials --resource-group jokemongo --name jokemongo-cluster
 ```
 
 Create the not-so-secret secret:
@@ -111,7 +111,6 @@ kubectl create -f k8s/replicated-deployment.yml
 ```
 
 TODO:
-- auth failure issue??
 - mongodb failover
 - domain
 - ssl
