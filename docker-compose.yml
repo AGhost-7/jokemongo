@@ -4,5 +4,5 @@ services:
     environment:
       - MONGO_INITDB_ROOT_PASSWORD=foobar
       - MONGO_INITDB_ROOT_USERNAME=root
-    image: mongo:4.1
+    image: aghost7/mongo-dev:4.1
     network_mode: host
