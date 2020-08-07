@@ -1,4 +1,4 @@
-FROM node:carbon
+FROM node:14
 
 WORKDIR /app
 
@@ -10,5 +10,8 @@ RUN yarn install --frozen-lockfile --prod
 COPY ./lib /app/lib
 COPY ./bin /app/bin
 
-CMD ["/app/bin/jokemongo"]
+COPY ./entrypoint.sh /entrypoint.sh
 
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["/app/bin/jokemongo"]

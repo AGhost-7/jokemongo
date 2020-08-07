@@ -1,0 +1,145 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jokemongo
+spec:
+  ports:
+    - port: 8066
+      targetPort: 8066
+      protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: jokemongo
+    tier: front
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jokemongo
+  labels:
+    app: jokemongo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jokemongo
+      tier: front
+  template:
+    metadata:
+      labels:
+        app: jokemongo
+        tier: front
+    spec:
+      containers:
+      - image: aghost7/jokemongo
+        name: jokemongo
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8067
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        env:
+        - name: jokemongo.db.host
+          value: redis-sentinel
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: jokemongo
+    tier: db
+    component: sentinel
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-sentinel
+  labels:
+    app: jokemongo
+    tier: db
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: jokemongo
+      tier: db
+      component: sentinel
+  template:
+    metadata:
+      labels:
+        app: jokemongo
+        tier: db
+        component: sentinel
+    spec:
+      containers:
+      - image: bitnami/redis-sentinel:5
+        name: redis-sentinel
+        env:
+        - name: REDIS_MASTER_HOST
+          value: redis
+        volumeMounts:
+          - name: sentinel-volume
+            mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: sentinel-volume
+    spec:
+      accessModes: 
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: jokemongo
+    tier: db
+    component: redis
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-master
+  labels:
+    app: jokemongo
+    tier: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jokemongo
+      tier: db
+      component: redis
+template:
+  metadata:
+    labels:
+      app: jokemongo
+      tier: db
+      component: redis
+  spec:
+    containers:
+      - image: redis:5
+        name: redis
+    volumeMounts:
+      - name: redis-volume
+        mountPath: /data
+volumeClaimTemplates:
+  - metadata:
+      name: redis-volume
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests: 1Gi
