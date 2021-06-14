@@ -1,5 +1,8 @@
 version: "2.1"
 services:
+  app:
+    image: aghost7/jokemongo
+    network_mode: host
   db:
     environment:
       - MONGO_INITDB_ROOT_PASSWORD=foobar
