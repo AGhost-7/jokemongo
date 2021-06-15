@@ -11,3 +11,10 @@ health.listen(config.get('health.port'), () => {
 app.listen(config.get('app.port'), () => {
   console.log('Listening on port %s', config.get('app.port'))
 })
+
+for (const code of ['SIGINT', 'SIGTERM']) {
+	process.on(code, () => {
+		console.log('Received %s signal, terminating', code)
+		process.exit(0)
+	})
+}
